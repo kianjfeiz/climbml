@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Datasets, weights and run outputs stay out of git
+data/
+datasets/
+runs/
+artifacts/
+weights/*
+!weights/.gitkeep
+*.pt
+*.mlpackage/
+*.onnx
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Secrets
+.env

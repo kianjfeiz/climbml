@@ -1,0 +1,75 @@
+{
+ "overview": "The blue family splits across this wall, but the strongest connected line ladders straight up the right arete from the low start blobs to the top jugs. Long pulls between decent edges - set your feet before every reach.",
+ "grade": "V3-V4",
+ "style": [
+  "powerful",
+  "reachy"
+ ],
+ "confidence": 0.55,
+ "moves": [
+  {
+   "limb": "LH",
+   "hold": 59,
+   "action": "start on the low pinch",
+   "detail": "Feet on the low blobs before you pull on.",
+   "isCrux": false,
+   "confidence": 0.9
+  },
+  {
+   "limb": "RH",
+   "hold": 27,
+   "action": "take the tall start blob",
+   "detail": null,
+   "isCrux": false,
+   "confidence": 0.9
+  },
+  {
+   "limb": "RF",
+   "hold": 27,
+   "action": "step onto the start blob's lip",
+   "detail": null,
+   "isCrux": false,
+   "confidence": 0.75
+  },
+  {
+   "limb": "RH",
+   "hold": 49,
+   "action": "reach high up the arete edge",
+   "detail": "Straight left arm; push through the right foot.",
+   "isCrux": false,
+   "confidence": 0.7
+  },
+  {
+   "limb": "LH",
+   "hold": 68,
+   "action": "bump to the crimp just above",
+   "detail": null,
+   "isCrux": false,
+   "confidence": 0.7
+  },
+  {
+   "limb": "LF",
+   "hold": 27,
+   "action": "walk your foot up the blob",
+   "detail": null,
+   "isCrux": false,
+   "confidence": 0.6
+  },
+  {
+   "limb": "RH",
+   "hold": 34,
+   "action": "throw for the top-right jug",
+   "detail": "Drive off the right foot - this is the move.",
+   "isCrux": true,
+   "confidence": 0.6
+  },
+  {
+   "limb": "LH",
+   "hold": 13,
+   "action": "cross to the top center jug",
+   "detail": "Flag the left foot to kill the swing.",
+   "isCrux": false,
+   "confidence": 0.65
+  }
+ ]
+}

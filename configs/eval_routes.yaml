@@ -1,0 +1,20 @@
+# Curated evaluation set for the beta engine.
+#
+# Picked from the dataset's densest images (see `climbml beta-candidates`), then
+# checked by eye: real walls rather than catalog product shots, varied styles,
+# and colour groups the clusterer separates cleanly. Some images appear more than
+# once because one photo holds several routes, which tests whether route
+# isolation changes the beta.
+#
+# color: null takes the most prominent cluster, which is what a user would get.
+
+- {split: valid, stem: 2022-12-09_14-54-25_UTC_jpg.rf.89e0ef823ce486dfd9e180d2e60a5293, color: Purple}
+- {split: valid, stem: 2022-12-09_14-54-25_UTC_jpg.rf.89e0ef823ce486dfd9e180d2e60a5293, color: Pink}
+- {split: valid, stem: 2022-12-09_14-54-25_UTC_jpg.rf.89e0ef823ce486dfd9e180d2e60a5293, color: Blue}
+- {split: test,  stem: 2022-12-09_14-00-59_UTC_jpg.rf.f8006b1188e39bd18ac6253a67e245e1, color: Red}
+- {split: test,  stem: 2022-12-09_14-00-59_UTC_jpg.rf.f8006b1188e39bd18ac6253a67e245e1, color: Orange}
+- {split: valid, stem: 2022-12-11_09-51-29_UTC_jpg.rf.0ec8e7a7ba0a9e2e43a0e97999d14b2c, color: Pink}
+- {split: valid, stem: 2022-12-07_14-31-06_UTC_jpg.rf.a51dedea1dd0a3aa4c575c13ad7a04d8, color: Green}
+- {split: valid, stem: 2022-12-11_01-29-31_UTC_jpg.rf.fbc02401330f18eb1283c63a769816b8, color: Yellow}
+- {split: valid, stem: IMG_8993_jpg.rf.a8d4cf5d9459f471c16836e73f204a39, color: Red}
+- {split: test,  stem: 2022-12-09_14-47-34_UTC_jpg.rf.716788b200e80f48219b88a4be1ca11e, color: Pink}

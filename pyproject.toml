@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "climbml"
+version = "0.1.0"
+description = "Hold detection and route beta generation for indoor climbing photos"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = ["computer-vision", "object-detection", "yolo", "climbing", "vlm"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=1.26",
+    "pillow>=10.1",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+# Training, evaluation, export and the EDA plots.
+train = [
+    "ultralytics>=8.3",
+    "opencv-python>=4.9",
+    "matplotlib>=3.8",
+]
+# Beta generation against the Claude API.
+beta = ["anthropic>=0.40"]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+climbml = "climbml.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# Prompt and schema text is verbatim; wrapping it would change what is sent.
+"src/climbml/beta/schema.py" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff.lint.isort]
+known-first-party = ["climbml"]
+known-local-folder = ["synthetic"]
