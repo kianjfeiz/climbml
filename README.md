@@ -50,8 +50,9 @@ understated by 13 points: 0.764 before, 0.896 after. See
 
 ### Beta generation
 
-Claude Sonnet 5 with structured outputs, compared over 11 curated routes at four
-thinking and effort settings. Adaptive thinking at `low` effort won: 10-20 s and
+Claude Sonnet 5 through OpenRouter with structured outputs, compared over 11
+curated routes at four
+thinking and effort settings. Reasoning at `low` effort won: 10-20 s and
 about 2 cents per route. `medium` took 31-70 s for marginal gains. Default (high)
 effort returned nothing at all, because it spends the whole token budget
 thinking.
@@ -65,7 +66,7 @@ pip install -e ".[train,beta]"
 
 The base install is numpy, Pillow and PyYAML only, so the route and beta code can
 be imported and tested without PyTorch. `[train]` adds ultralytics, OpenCV and
-matplotlib. `[beta]` adds the Anthropic SDK.
+matplotlib. `[beta]` adds the OpenAI SDK, used against OpenRouter.
 
 ## Use
 
@@ -83,7 +84,7 @@ climbml beta-run --variant low               # generate, score and render beta
 climbml beta-report                          # scoreboard across saved runs
 ```
 
-`beta-run` needs `ANTHROPIC_API_KEY`. Everything else runs offline. Paths come
+`beta-run` needs `OPENROUTER_API_KEY`. Everything else runs offline. Paths come
 from `climbml/config.py` and can be overridden with `CLIMBML_DATASET`,
 `CLIMBML_WEIGHTS`, `CLIMBML_RUNS` and `CLIMBML_ARTIFACTS`.
 

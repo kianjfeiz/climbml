@@ -42,7 +42,7 @@ def test_variants_cover_the_effort_ladder():
 
 def test_result_cost_uses_model_pricing():
     result = Result(plan={}, errors=[], latency_s=1.0, input_tokens=1_000_000,
-                    output_tokens=100_000, repaired=False, model="claude-sonnet-5")
+                    output_tokens=100_000, repaired=False, model="anthropic/claude-sonnet-5")
     assert result.cost == 3.00 + 1.5
 
 

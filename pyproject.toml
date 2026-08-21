@@ -27,8 +27,8 @@ train = [
     "opencv-python>=4.9",
     "matplotlib>=3.8",
 ]
-# Beta generation against the Claude API.
-beta = ["anthropic>=0.40"]
+# Beta generation through OpenRouter (OpenAI-compatible API).
+beta = ["openai>=1.40"]
 dev = ["pytest>=8.0", "ruff>=0.6"]
 
 [project.scripts]
