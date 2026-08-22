@@ -96,11 +96,17 @@ def cmd_prep(args) -> None:
     print(f"-> {out}")
 
 
-def cmd_run(args) -> None:
-    from .engine import generate  # keep the API client import lazy
+def run_dir_name(model: str, variant: str) -> str:
+    """One directory per model+variant, so comparison runs never overwrite."""
+    return f"{model.replace('/', '-')}.{variant}"
 
+
+def cmd_run(args) -> None:
+    from .engine import generate, resolve_model  # keep the API client import lazy
+
+    model = resolve_model(args.model)
     variant = VARIANTS[args.variant]
-    out = OUT_DIR / args.variant
+    out = OUT_DIR / run_dir_name(model, args.variant)
     out.mkdir(parents=True, exist_ok=True)
     total_cost = 0.0
 
@@ -111,7 +117,7 @@ def cmd_run(args) -> None:
         if payload is None:
             continue
 
-        result = generate(payload, model=args.model, **variant)
+        result = generate(payload, model=model, **variant)
         total_cost += result.cost
         holds_by_id = {h["id"]: h for h in payload.holds_json}
         key = route_key(route, payload.color)

@@ -1,5 +1,7 @@
-from climbml.beta.engine import VARIANTS, Result
-from climbml.beta.harness import flags, load_routes, route_key
+import pytest
+
+from climbml.beta.engine import VARIANTS, Result, resolve_model
+from climbml.beta.harness import flags, load_routes, route_key, run_dir_name
 
 
 def record(errors=(), **report):
@@ -40,12 +42,32 @@ def test_variants_cover_the_effort_ladder():
     assert VARIANTS["fast"]["thinking"] is False
 
 
-def test_result_cost_uses_model_pricing():
+def test_result_carries_the_cost_openrouter_reported():
     result = Result(plan={}, errors=[], latency_s=1.0, input_tokens=1_000_000,
-                    output_tokens=100_000, repaired=False, model="anthropic/claude-sonnet-5")
-    assert result.cost == 3.00 + 1.5
+                    output_tokens=100_000, repaired=False,
+                    model="some-provider/some-model", cost=0.0451)
+    assert result.cost == 0.0451
 
 
-def test_unknown_model_costs_nothing_rather_than_guessing():
-    result = Result({}, [], 1.0, 1000, 1000, False, model="some-other-model")
+def test_cost_defaults_to_zero_when_the_router_reports_none():
+    result = Result({}, [], 1.0, 1000, 1000, False, model="some-provider/some-model")
     assert result.cost == 0.0
+
+
+def test_model_comes_from_the_argument_or_the_environment(monkeypatch):
+    monkeypatch.delenv("CLIMBML_BETA_MODEL", raising=False)
+    assert resolve_model("some-provider/some-model") == "some-provider/some-model"
+    monkeypatch.setenv("CLIMBML_BETA_MODEL", "other/model")
+    assert resolve_model(None) == "other/model"
+    assert resolve_model("explicit/wins") == "explicit/wins"
+
+
+def test_no_model_is_an_error_rather_than_a_baked_in_default(monkeypatch):
+    monkeypatch.delenv("CLIMBML_BETA_MODEL", raising=False)
+    with pytest.raises(SystemExit):
+        resolve_model(None)
+
+
+def test_run_dirs_keep_models_apart():
+    assert run_dir_name("a/one", "low") != run_dir_name("b/two", "low")
+    assert "/" not in run_dir_name("a/one", "low")

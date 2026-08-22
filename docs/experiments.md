@@ -32,9 +32,12 @@ hedging to the middle of the grade scale.
   plus the next lowest within 25% of image width". The old rule picked
   wall-spanning pairs on spray walls, and the model followed them.
 
-**Shipped:** `claude-sonnet-5`, adaptive thinking, effort `low`, max_tokens 8000,
-prompt version 2. About 10-20 s per route, up to 35 s on 30+ hold clusters, and
-1.5-2.5 cents each at the introductory rate.
+**Baseline, first model measured:** `anthropic/claude-sonnet-5` via OpenRouter,
+reasoning at `low` effort, max_tokens 8000, prompt version 2. About 10-20 s per
+route, up to 35 s on 30+ hold clusters, and 1.5-2.5 cents each at the rate then.
+The slug is recorded because the numbers above are meaningless without it; the
+engine hardcodes no provider, so every model after this one is a `--model` flag
+against the same prompt, schema and scoreboard.
 
 ## 2026-07-23 — Beta engine: grounding, schema, evaluation harness
 

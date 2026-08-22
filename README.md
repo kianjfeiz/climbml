@@ -50,12 +50,23 @@ understated by 13 points: 0.764 before, 0.896 after. See
 
 ### Beta generation
 
-Claude Sonnet 5 through OpenRouter with structured outputs, compared over 11
-curated routes at four
-thinking and effort settings. Reasoning at `low` effort won: 10-20 s and
-about 2 cents per route. `medium` took 31-70 s for marginal gains. Default (high)
-effort returned nothing at all, because it spends the whole token budget
-thinking.
+Model-agnostic: the prompt, JSON schema, grounding validator and scoreboard are
+shared, and the model is a runtime argument, so any vision model OpenRouter
+serves can be dropped into the same 11-route benchmark and compared on quality,
+latency and cost. OpenRouter reports what each call actually charged, so the
+cost column stays honest across providers instead of tracking a price table.
+
+Runs are keyed by model and variant, so comparisons never overwrite each other:
+
+```bash
+climbml beta-run --model <provider>/<model> --variant low
+climbml beta-report          # every model and variant side by side
+```
+
+Reasoning effort matters more than it looks. At `low` effort a run takes 10-20 s
+and about 2 cents per route; `medium` took 31-70 s for marginal gains; default
+(high) effort returned nothing at all, because it spends the whole token budget
+thinking before it starts writing.
 
 ## Install
 
@@ -80,13 +91,14 @@ climbml export runs/detect/y26n-640-v12-a --format coreml
 
 climbml colors path/to/wall.jpg              # per-hold HSV and colour bin
 climbml beta-prep                            # build payloads and renders, no API calls
-climbml beta-run --variant low               # generate, score and render beta
+climbml beta-run --model <provider>/<model>   # generate, score and render beta
 climbml beta-report                          # scoreboard across saved runs
 ```
 
-`beta-run` needs `OPENROUTER_API_KEY`. Everything else runs offline. Paths come
-from `climbml/config.py` and can be overridden with `CLIMBML_DATASET`,
-`CLIMBML_WEIGHTS`, `CLIMBML_RUNS` and `CLIMBML_ARTIFACTS`.
+`beta-run` needs `OPENROUTER_API_KEY`, and a model from `--model` or
+`CLIMBML_BETA_MODEL` — there is no default provider. Everything else runs
+offline. Paths come from `climbml/config.py` and can be overridden with
+`CLIMBML_DATASET`, `CLIMBML_WEIGHTS`, `CLIMBML_RUNS` and `CLIMBML_ARTIFACTS`.
 
 ## Layout
 

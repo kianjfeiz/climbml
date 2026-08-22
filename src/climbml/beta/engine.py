@@ -20,15 +20,11 @@ from .schema import BETA_SCHEMA, SYSTEM_PROMPT, user_prompt, validate
 BASE_URL = "https://openrouter.ai/api/v1"
 API_KEY_ENV = "OPENROUTER_API_KEY"
 
-#: OpenRouter model slug: ``<provider>/<model>``.
-MODEL = "anthropic/claude-sonnet-5"
+#: Which model to read beta with, as an OpenRouter ``<provider>/<model>`` slug.
+#: No provider is baked in: pass ``--model`` or set this, so the same prompt,
+#: schema and scoreboard can be pointed at any model OpenRouter serves.
+MODEL_ENV = "CLIMBML_BETA_MODEL"
 MAX_TOKENS = 8000
-
-#: $ per million tokens (input, output), for the cost column in reports.
-#: OpenRouter bills the upstream provider's list price, so these track Sonnet 5
-#: list; introductory pricing (2.00/10.00) applied through 2026-08-31, so
-#: historical figures in docs/experiments.md read lower.
-PRICING = {"anthropic/claude-sonnet-5": (3.00, 15.00)}
 
 #: effort/thinking presets compared in the evaluation harness
 VARIANTS = {
@@ -39,6 +35,16 @@ VARIANTS = {
 }
 
 
+def resolve_model(model: str | None = None) -> str:
+    """The model slug to run, from the argument or the environment."""
+    slug = model or os.environ.get(MODEL_ENV)
+    if not slug:
+        raise SystemExit(
+            f"no model given: pass --model or set {MODEL_ENV} to an OpenRouter "
+            "slug like <provider>/<model> (see https://openrouter.ai/models)")
+    return slug
+
+
 @dataclass
 class Result:
     plan: dict | None
@@ -47,12 +53,11 @@ class Result:
     input_tokens: int
     output_tokens: int
     repaired: bool
-    model: str = MODEL
-
-    @property
-    def cost(self) -> float:
-        price_in, price_out = PRICING.get(self.model, (0.0, 0.0))
-        return (self.input_tokens * price_in + self.output_tokens * price_out) / 1e6
+    model: str
+    #: USD actually charged, as reported by OpenRouter. Asking the router what
+    #: the call cost keeps the scoreboard honest across models rather than
+    #: carrying a price table that goes stale every time a provider re-prices.
+    cost: float = 0.0
 
 
 def _client():
@@ -65,6 +70,18 @@ def _client():
     return openai.OpenAI(base_url=BASE_URL, api_key=key)
 
 
+def _usage(response) -> tuple[int, int, float]:
+    """(input tokens, output tokens, USD) from an OpenRouter response."""
+    usage = getattr(response, "usage", None)
+    if usage is None:
+        return 0, 0, 0.0
+    extra = getattr(usage, "model_extra", None) or {}
+    cost = getattr(usage, "cost", None)
+    if cost is None:
+        cost = extra.get("cost", 0.0)
+    return (usage.prompt_tokens or 0, usage.completion_tokens or 0, float(cost or 0.0))
+
+
 def _image_block(payload: Payload) -> dict:
     buf = io.BytesIO()
     payload.image.save(buf, format="JPEG", quality=82)
@@ -73,13 +90,14 @@ def _image_block(payload: Payload) -> dict:
             "image_url": {"url": f"data:image/jpeg;base64,{data}"}}
 
 
-def generate(payload: Payload, client=None, model: str = MODEL,
+def generate(payload: Payload, client=None, model: str | None = None,
              effort: str | None = None, thinking: bool = True) -> Result:
     """Generate one move plan for an isolated route.
 
-    ``client`` is an OpenAI-compatible client bound to OpenRouter; one is
-    constructed from the environment when omitted.
+    ``model`` is any OpenRouter slug; ``client`` is an OpenAI-compatible client
+    bound to OpenRouter, constructed from the environment when omitted.
     """
+    model = resolve_model(model)
     if client is None:
         client = _client()
 
@@ -100,7 +118,8 @@ def generate(payload: Payload, client=None, model: str = MODEL,
         max_tokens=MAX_TOKENS,
         response_format={"type": "json_schema", "json_schema": {
             "name": "beta_plan", "strict": True, "schema": BETA_SCHEMA}},
-        extra_body={"reasoning": reasoning, "provider": {"require_parameters": True}},
+        extra_body={"reasoning": reasoning, "provider": {"require_parameters": True},
+                    "usage": {"include": True}},
     )
 
     valid_ids = {h["id"] for h in payload.holds_json}
@@ -108,14 +127,16 @@ def generate(payload: Payload, client=None, model: str = MODEL,
 
     started = time.time()
     in_tokens = out_tokens = 0
+    cost = 0.0
     repaired = False
     plan, errors = None, []
 
     for attempt in range(2):
         response = client.chat.completions.create(**kwargs, messages=messages)
-        if response.usage:
-            in_tokens += response.usage.prompt_tokens
-            out_tokens += response.usage.completion_tokens
+        used_in, used_out, used_cost = _usage(response)
+        in_tokens += used_in
+        out_tokens += used_out
+        cost += used_cost
         choice = response.choices[0]
         if choice.message.refusal:
             errors = [f"refusal: {choice.message.refusal}"]
@@ -142,4 +163,5 @@ def generate(payload: Payload, client=None, model: str = MODEL,
              + ". Re-read the tags and produce a corrected full plan."},
         ]
 
-    return Result(plan, errors, time.time() - started, in_tokens, out_tokens, repaired, model)
+    return Result(plan, errors, time.time() - started, in_tokens, out_tokens,
+                  repaired, model, cost)

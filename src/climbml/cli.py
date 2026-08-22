@@ -63,7 +63,9 @@ def build_parser() -> argparse.ArgumentParser:
     run = sub.add_parser("beta-run", help="generate beta for the evaluation routes")
     run.add_argument("--variant", default="low",
                      choices=("thinking", "medium", "low", "fast"))
-    run.add_argument("--model", default=None)
+    run.add_argument("--model", default=None,
+                     help="OpenRouter slug, e.g. <provider>/<model>; "
+                          "defaults to $CLIMBML_BETA_MODEL")
     run.add_argument("--only", help="substring of the image stem")
 
     sub.add_parser("beta-report", help="scoreboard across saved runs")
@@ -97,9 +99,6 @@ def main(argv: list[str] | None = None) -> None:
     if args.command == "beta-prep":
         return harness.cmd_prep(args)
     if args.command == "beta-run":
-        if args.model is None:
-            from .beta.engine import MODEL
-            args.model = MODEL
         return harness.cmd_run(args)
     if args.command == "beta-report":
         return harness.cmd_report(args)
