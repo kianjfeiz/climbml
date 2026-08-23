@@ -59,7 +59,7 @@ cost column stays honest across providers instead of tracking a price table.
 Runs are keyed by model and variant, so comparisons never overwrite each other:
 
 ```bash
-climbml beta-run --model <provider>/<model> --variant low
+climbml beta-run --model PROVIDER/MODEL --variant low
 climbml beta-report          # every model and variant side by side
 ```
 
@@ -91,7 +91,7 @@ climbml export runs/detect/y26n-640-v12-a --format coreml
 
 climbml colors path/to/wall.jpg              # per-hold HSV and colour bin
 climbml beta-prep                            # build payloads and renders, no API calls
-climbml beta-run --model <provider>/<model>   # generate, score and render beta
+climbml beta-run --model PROVIDER/MODEL      # generate, score and render beta
 climbml beta-report                          # scoreboard across saved runs
 ```
 
