@@ -1,16 +1,14 @@
 # climbML
 
-Takes a photo of a climbing wall, finds the holds, groups them into a single
-route by colour, and generates a move-by-move sequence for climbing it.
+Takes a photo of a climbing wall, finds the holds, groups them by route in reference to color
 
 ```
 photo ──▶ hold detection ──▶ route isolation ──▶ beta generation
           YOLO26n            colour clustering    VLM + Set-of-Mark
-          fine-tune          + prominence         + schema validation
+                             + prominence         + schema validation
 ```
 
-Only the first stage is trained. Route isolation is colour rules, and beta
-generation is a prompted vision-language model with a validated response schema.
+
 
 ![A yellow route isolated from a spray wall, holds outlined and numbered](docs/images/route-isolated.jpg)
 
@@ -20,8 +18,7 @@ The numbers are how it refers to a hold.*
 
 ![The generated sequence drawn over the wall, with the move list beside it](docs/images/beta-example.jpg)
 
-*Generated beta: one track per limb, nodes numbered in move order, move list
-alongside. Wall photo from the dataset (CC BY 4.0).*
+
 
 ## Results
 
@@ -36,7 +33,7 @@ Per-image means at conf 0.25 on val: precision 0.90, recall 0.88. Inference
 6.1 ms/image on an M3 Pro. Weights 5.4 MB, or 4.8 MB exported to CoreML fp16.
 val and test agree, so the model is not overfit to the validation split.
 
-### The dataset labels were partly corrupted
+### Dataset correction (w/ agents)
 
 Ranking the validation split by per-image recall turned up images where the
 detections were correct but recall was near zero. Those annotations had been
@@ -50,11 +47,8 @@ understated by 13 points: 0.764 before, 0.896 after. See
 
 ### Beta generation
 
-Model-agnostic: the prompt, JSON schema, grounding validator and scoreboard are
-shared, and the model is a runtime argument, so any vision model OpenRouter
-serves can be dropped into the same 11-route benchmark and compared on quality,
-latency and cost. OpenRouter reports what each call actually charged, so the
-cost column stays honest across providers instead of tracking a price table.
+The beta generation is model agnostic! Measured accuracy is quite good on a range of models. 
+Sonnet 5, Luna max (especially great!) and deepseek v4 flash were my best resuslts
 
 Runs are keyed by model and variant, so comparisons never overwrite each other:
 
